@@ -1,0 +1,104 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An independent browser-based educational prototype for trifilar-pendulum moment-of-inertia calculations, baseline subtraction, uncertainty propagation, and CSV export.">
+  <title>Trifilar Pendulum Lab — Independent Educational Prototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <p class="eyebrow">VIRTUAL PHYSICS LAB · INDEPENDENT PROTOTYPE</p>
+      <h1>Trifilar Pendulum Lab</h1>
+      <p class="sub">Measure, compare, and estimate moment of inertia with uncertainty.</p>
+    </div>
+    <button id="startBtn" type="button" class="secondary">Pause animation</button>
+  </header>
+
+  <main>
+    <p class="sample-warning"><strong>Illustrative starting values:</strong> replace them with your own apparatus dimensions, measured masses, timings, and instrument uncertainties. Outputs are not experimental evidence until validated against real measurements.</p>
+
+    <section class="panel apparatus" aria-labelledby="apparatus-title">
+      <div class="section-heading"><div><p class="eyebrow">01 · APPARATUS</p><h2 id="apparatus-title">Visualization</h2></div></div>
+      <canvas id="scene" width="900" height="420" role="img" aria-label="Illustrative animation of a platform suspended by three filaments"></canvas>
+      <p class="hint">Illustrative animation only. The calculation uses the geometry and periods entered below; it does not simulate the physical dynamics.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="geometry-title">
+      <div class="section-heading"><div><p class="eyebrow">02 · APPARATUS GEOMETRY</p><h2 id="geometry-title">Geometry and dimensional uncertainty</h2></div></div>
+      <div class="formgrid">
+        <label>Vertical separation, H (m)<input id="separation" type="number" min="0.000001" step="0.000001" value="0.998749"></label>
+        <label>Standard uncertainty in H (m)<input id="separationUncertainty" type="number" min="0" step="0.0001" value="0.001"></label>
+        <label>Upper attachment radius, R (m)<input id="upperRadius" type="number" min="0.000001" step="0.0001" value="0.05"></label>
+        <label>Standard uncertainty in R (m)<input id="upperRadiusUncertainty" type="number" min="0" step="0.0001" value="0.0008"></label>
+        <label>Lower attachment radius, r (m)<input id="lowerRadius" type="number" min="0.000001" step="0.0001" value="0.025"></label>
+        <label>Standard uncertainty in r (m)<input id="lowerRadiusUncertainty" type="number" min="0" step="0.0001" value="0.0004"></label>
+      </div>
+      <p class="hint">H is the vertical separation between the upper and lower attachment planes in the resting position. When upper and lower radii are equal, this reduces to the usual ideal small-angle relation with R².</p>
+    </section>
+
+    <section class="panel" aria-labelledby="loaded-title">
+      <div class="section-heading"><div><p class="eyebrow">03 · LOADED MEASUREMENT</p><h2 id="loaded-title">Platform plus specimen</h2></div></div>
+      <div class="formgrid">
+        <label>Total suspended mass, m₁ (kg)<input id="loadedMass" type="number" min="0.000001" step="0.001" value="2.0"></label>
+        <label>Standard uncertainty in m₁ (kg)<input id="loadedMassUncertainty" type="number" min="0" step="0.001" value="0.005"></label>
+        <label>Elapsed time for N oscillations, t₁ (s)<input id="loadedElapsedTime" type="number" min="0.000001" step="0.01" value="20"></label>
+        <label>Number of oscillations, N₁<input id="loadedOscillations" type="number" min="1" step="1" value="10"></label>
+        <label>Standard timing uncertainty, u(t₁) (s)<input id="loadedTimeUncertainty" type="number" min="0" step="0.01" value="0.02"></label>
+      </div>
+      <p class="hint">The mean period is calculated as T₁ = t₁ / N₁. The number of oscillations is treated as an exact count; the timing uncertainty should reflect your timer and measurement procedure.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="baseline-title">
+      <div class="section-heading"><div><p class="eyebrow">04 · BASELINE</p><h2 id="baseline-title">Empty platform measurement</h2></div></div>
+      <label class="toggle"><input id="baselineEnabled" type="checkbox" checked> Subtract the empty-platform baseline to estimate specimen inertia</label>
+      <div id="baselineFields" class="formgrid">
+        <label>Empty platform mass, m₀ (kg)<input id="baselineMass" type="number" min="0.000001" step="0.001" value="0.8"></label>
+        <label>Standard uncertainty in m₀ (kg)<input id="baselineMassUncertainty" type="number" min="0" step="0.001" value="0.005"></label>
+        <label>Elapsed time for N₀ oscillations, t₀ (s)<input id="baselineElapsedTime" type="number" min="0.000001" step="0.01" value="16"></label>
+        <label>Number of oscillations, N₀<input id="baselineOscillations" type="number" min="1" step="1" value="10"></label>
+        <label>Standard timing uncertainty, u(t₀) (s)<input id="baselineTimeUncertainty" type="number" min="0" step="0.01" value="0.02"></label>
+      </div>
+      <p class="hint">The baseline run must use the same apparatus geometry and measurement configuration. The loaded mass includes the platform plus the specimen; the baseline mass is the empty platform assembly.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="results-title">
+      <div class="section-heading"><div><p class="eyebrow">05 · RESULTS</p><h2 id="results-title">Calculation results</h2></div></div>
+      <div class="actions">
+        <button id="calcBtn" type="button">Calculate</button>
+        <button id="trialBtn" type="button" class="secondary">Save trial</button>
+        <button id="csvBtn" type="button" class="secondary">Export trials CSV</button>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite">Ready. Check the illustrative inputs and select Calculate.</p>
+      <div class="result-grid">
+        <article class="result"><span>Loaded assembly inertia</span><strong id="loadedResult">—</strong><small id="loadedUncertaintyResult">Standard uncertainty: —</small></article>
+        <article class="result" id="baselineResultCard"><span>Empty platform inertia</span><strong id="baselineResult">—</strong><small id="baselineUncertaintyResult">Standard uncertainty: —</small></article>
+        <article class="result featured"><span id="specimenLabel">Specimen inertia</span><strong id="specimenResult">—</strong><small id="specimenUncertaintyResult">Standard uncertainty: —</small><small id="relativeUncertaintyResult">Relative standard uncertainty: —</small></article>
+      </div>
+      <div class="formula-box">
+        <p><strong>Idealized relationship</strong></p>
+        <p>I = mgRrT² / (4π²H), with T = elapsed time / oscillation count.</p>
+        <p>With baseline subtraction: I<sub>specimen</sub> = I<sub>loaded</sub> − I<sub>platform</sub>.</p>
+        <p class="hint">Uncertainties are first-order standard uncertainties. Mass and timing inputs are treated as independent, and the same geometry is treated as shared/correlated between loaded and baseline runs. The model treats H, R, and r uncertainties as mutually independent; geometry covariance and systematic model errors are not included.</p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="trials-title">
+      <div class="section-heading"><div><p class="eyebrow">06 · RECORD KEEPING</p><h2 id="trials-title">Saved trials</h2></div></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>#</th><th>Saved at</th><th>Loaded period (s)</th><th>Loaded inertia (kg·m²)</th><th>Specimen inertia (kg·m²)</th><th>Standard uncertainty (kg·m²)</th><th></th></tr></thead>
+          <tbody id="trials"><tr><td colspan="7">No trials saved yet.</td></tr></tbody>
+        </table>
+      </div>
+      <p class="hint">Trials remain in this browser tab only; export them to CSV before closing or refreshing the page.</p>
+    </section>
+  </main>
+  <footer>Independent educational prototype · Not the original registered software · Validate the model and measurements before research use.</footer>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

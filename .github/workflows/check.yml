@@ -1,0 +1,33 @@
+name: Check educational prototype
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  javascript-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: Check JavaScript syntax
+        run: |
+          node --check model.js
+          node --check app.js
+      - name: Test calculation model
+        run: node tests/test_model.js
+
+  python-reference-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Run standard-library reference comparison tests
+        run: python3 -m unittest discover -s tests -v
