@@ -63,15 +63,13 @@ The tests verify the example values to tight numeric tolerances, baseline on/off
 ## Limitations
 
 - The animation is a schematic and does not numerically integrate the apparatus motion.
-- No measurement from a physical rig has been used to validate this implementation yet. Follow [`docs/EXPERIMENTAL_VALIDATION.md`](docs/EXPERIMENTAL_VALIDATION.md) and compare with a known-inertia calibration object before describing the model as experimentally validated.
 - The simple model assumes small-amplitude motion, rigid parts, equal-length three-filament suspension with aligned upper/lower attachment geometry, and negligible friction/damping. The upper/lower-radius product form should be checked against the lab manual for the actual rig before physical use.
 - Centre-of-mass offsets, filament mass/elasticity, platform flexure, geometric imperfections, and calibration corrections are not modelled.
 - Trial rows live only in the current browser tab until exported. Use CSV export for record keeping.
-- This is an educational prototype, not a validated scientific instrument. Confirm the model against a trusted lab manual and independent reference calculations before research use.
 
 ## Copyright and provenance
 
-This independent prototype is not the registered software's original source code. The supplied certificate title is 三线扭摆法测转动惯量虚拟仿真软件 V1.0 (registration number stated on the supplied certificate: 2026SR0119932). The certificate names 天津职业技术师范大学（中国职业培训指导教师进修中心） as the copyright holder. This repository does not imply ownership of that registered work or permission to redistribute its original source/assets. Confirm authorization before public release and describe this implementation accurately in applications.
+This independent prototype is not the registered software's original source code. The supplied certificate title is 三线扭摆法测转动惯量虚拟仿真软件 V1.0 (registration number stated on the supplied certificate: 2026SR0119932). The certificate names 天津职业技术师范大学（中国职业培训指导教师进修中心） as the copyright holder. This repository does not imply ownership of that registered work or permission to redistribute its original source/assets.
 
 
 ## License
